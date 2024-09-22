@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Enhancer</title>
+</head>
+<body>
+    <input type="file" id="imageInput" accept="image/*">
+    <button onclick="enhanceImage()">Enhance Image</button>
+    <div>
+        <h3>Original Image:</h3>
+        <img id="originalImage" style="max-width: 100%;">
+    </div>
+    <div>
+        <h3>Enhanced Image:</h3>
+        <canvas id="enhancedImage" style="max-width: 100%;"></canvas>
+    </div>
+
+    <script>
+        async function enhanceImage() {
+            const input = document.getElementById('imageInput');
+            const file = input.files[0];
+            if (!file) {
+                alert('Please select an image file.');
+                return;
+            }
+
+            const originalImage = document.getElementById('originalImage');
+            const enhancedCanvas = document.getElementById('enhancedImage');
+            const ctx = enhancedCanvas.getContext('2d');
+
+            // Display original image
+            originalImage.src = URL.createObjectURL(file);
+
+            // Wait for the image to load
+            await new Promise(resolve => {
+                originalImage.onload = resolve;
+            });
+
+            // Set canvas size
+            enhancedCanvas.width = originalImage.naturalWidth;
+            enhancedCanvas.height = originalImage.naturalHeight;
+
+            // Draw original image on canvas
+            ctx.drawImage(originalImage, 0, 0);
+
+            // Get image data
+            const imageData = ctx.getImageData(0, 0, enhancedCanvas.width, enhancedCanvas.height);
+            const data = imageData.data;
+
+            // Enhance image (increase contrast and brightness)
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = data[i] * 1.2;     // Red
+                data[i + 1] = data[i + 1] * 1.2; // Green
+                data[i + 2] = data[i + 2] * 1.2; // Blue
+            }
+
+            // Put enhanced image data back on canvas
+            ctx.putImageData(imageData, 0, 0);
+        }
+    </script>
+</body>
+</html>
